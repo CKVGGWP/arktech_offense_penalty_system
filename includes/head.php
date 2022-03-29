@@ -10,4 +10,4 @@
     <script src="assets/js/datatables.min.js"></script>
     <script src="assets/js/jquery.validate.min.js"></script>
     <?php session_start(); ?>
-    <title></title>
+    <title>Offense Penalty | Arktech Manufacturing</title>

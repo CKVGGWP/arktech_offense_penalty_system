@@ -38,6 +38,8 @@ class Offense extends Database
     {
         $option = '';
 
+        $option .= '<option selected disabled>Choose a sub-offense</option>';
+
         if (!empty($data)) {
             foreach ($data as $row) {
                 $option .= '<option value="' . $row['id'] . '">' . $row['offenseType'] . '</option>';
@@ -67,5 +69,41 @@ class Offense extends Database
         }
 
         return $data;
+    }
+
+    public function selectHR($id)
+    {
+        $sql = "SELECT 
+                e.idNumber 
+                FROM hr_employee e
+                LEFT JOIN hr_positions p ON e.position = p.positionId
+                WHERE p.positionName = 'HR Staff' 
+                AND e.status = 1
+                AND e.idNumber = '$id'";
+        $query = $this->connect()->query($sql);
+
+        if ($query->num_rows > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function selectIT($id)
+    {
+        $sql = "SELECT 
+                idNumber 
+                FROM hr_employee 
+                WHERE departmentId = '4' 
+                AND sectionId = '0'
+                AND status = '1'
+                AND idNumber = '$id'";
+        $query = $this->connect()->query($sql);
+
+        if ($query->num_rows > 0) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

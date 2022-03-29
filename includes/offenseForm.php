@@ -23,9 +23,10 @@
                     </div>
                     <label for="category1">Offense Type</label>
                     <select name="category1" class="form-select mb-2" id="category1" required>
+                        <option selected disabled>Choose an offense</option>
                         <?php
                         if (!empty($data)) :
-                            foreach ($data as $row) :
+                            foreach ($data as $key => $row) :
                                 echo "<option value='" . $row['id'] . "'>" . $row['offenseType'] . "</option>";
                             endforeach;
                         else :
