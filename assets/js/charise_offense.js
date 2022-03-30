@@ -1,6 +1,11 @@
 $(document).ready(function () {
+  $("#category1Group").addClass("d-none");
   $("#category2Group").addClass("d-none");
   $("#category3Group").addClass("d-none");
+});
+
+$("#employee").on("change", function () {
+  $("#category1Group").removeClass("d-none");
 });
 
 $("#category1").on("change", function () {
@@ -35,4 +40,37 @@ $("#category2").on("change", function () {
   });
 });
 
-// MODIFY END
+$("#employee").on("change", function () {
+  let employee = $(this).val();
+
+  $("#userTable").DataTable().clear().destroy();
+  $("#userTable").DataTable().destroy();
+
+  let dataTable = $("#userTable").DataTable({
+    lengthChange: false,
+    searching: false,
+    processing: true,
+    ordering: false,
+    serverSide: true,
+    bInfo: false,
+    // Get the data from the controller
+    ajax: {
+      url: "controllers/val_notificationsController.php", // json datasource
+      type: "POST", // method , by default get
+      data: { employeeName: 1, employee: employee },
+      error: function () {
+        // error handling
+      },
+    },
+    createdRow: function (row, data, index) {},
+    columnDefs: [],
+    fixedColumns: false,
+    deferRender: true,
+    scrollY: 500,
+    scrollX: false,
+    scroller: {
+      loadingIndicator: true,
+    },
+    stateSave: false,
+  });
+});

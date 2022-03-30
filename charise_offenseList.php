@@ -24,7 +24,7 @@
 
     <!-- Start of index -->
 
-    <main class="container">
+    <main class="my-3">
 
         <?php include('includes/offenseList.php'); ?>
 
