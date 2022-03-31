@@ -5,21 +5,10 @@
 </ul>
 <div class="d-flex flex-column justify-content-center">
     <div class="col-md-12 mt-3 px-4">
-        <!------------------- DataTables Example ----------------->
         <div class="card shadow mb-4">
             <div class="card-body">
-
-                <!------------------------ Textbox Search ----------------------->
-                <!-- <div class="row mb-3 ml-1">
-                        <div class="form-group mb-3">
-                            <label for="userFirstname">Filter & Search</label>
-                            <div class="col-sm">
-                                <input type="name" class="form-control" id="filter" onkeyup="filter()" name="filter">
-                            </div>
-                        </div>
-                    </div> -->
                 <div class="table-responsive">
-                    <table class="table table-bordered table-striped table-hover text-center text-nowrap" id="userTable" width="100%" cellspacing="0">
+                    <table class="table table-bordered table-striped table-hover text-center text-nowrap" id="offenseTable" width="100%" cellspacing="0">
                         <thead>
                             <tr>
                                 <th class="text-nowrap">Name</th>
@@ -32,13 +21,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <td class="text-nowrap">Juan Dela Cruz</td>
-                            <td class="text-wrap">Due to illness</td>
-                            <td class="text-wrap">1st Offense</td>
-                            <td class="text-wrap">2nd Offense</td>
-                            <td class="text-wrap">3rd Offense</td>
-                            <td class="text-wrap">Date Input</td>
-                            <td class="text-wrap">Date Updated</td>
+
                         </tbody>
                     </table>
                 </div>

@@ -12,10 +12,10 @@
                 <form method="POST" id="offenseForm">
                     <!-- EDITED BY CK -->
                     <div class="form-group">
-                        <div class="col-lg-12 mb-3">
-                            <label for="category1">Employee: </label>
-                            <select class="form-control selectpicker mt-2" name="employee" id="employee" data-live-search="true">
-                                <option selected disabled>Select an employee</option>
+                        <div class="col-lg-12 mb-2">
+                            <label class="fw-bold" for="category1">Employee: </label>
+                            <select class="form-control selectpicker mb-2" name="employee" id="employee" data-live-search="true" required>
+                                <option value="" selected disabled>Select an employee</option>
                                 <?php
                                 foreach ($employee as $key => $row) :
                                     echo '<option value="' . $row['idNumber'] . '">' . $row['firstName'] . ' ' . $row['surName'] . '</option>';
@@ -24,9 +24,9 @@
                             </select>
                         </div>
                         <div class="form-group" id="category1Group">
-                            <label for="category1">Offense Type: </label>
+                            <label class="fw-bold" for="category1">Offense Type: </label>
                             <select name="category1" class="form-select mb-2" id="category1" required>
-                                <option selected disabled>Choose an offense</option>
+                                <option value="" selected disabled>Choose an offense</option>
                                 <?php
                                 if (!empty($data)) :
                                     foreach ($data as $key => $row) :
@@ -38,31 +38,60 @@
                                 ?>
                             </select>
                         </div>
-                    </div>
-                    <div class="form-group" id="category2Group">
-                        <label for="category2">Offense: </label>
-                        <select class="form-select mb-2" id="category2">
-                            <option selected disabled>Choose a sub-offense</option>
+                        <div class="form-group" id="category2Group">
+                            <label class="fw-bold" for="category2">Offense: </label>
+                            <select class="form-select mb-2" id="category2">
+                                <option value="" selected disabled>Choose a sub-offense</option>
 
-                        </select>
+                            </select>
+                        </div>
                     </div>
-
-                    <div class="form-group row mb-3">
+                    <div class="form-group row firstOffense">
                         <div class="col-4">
-                            <p class="font-weight-bold">First Offense</p>
+                            <p class="fw-bold">First Offense</p>
                         </div>
                         <div class="col row mx-0">
                             <div class="form-check col-3">
-                                <input type="radio" value="1" class="form-check-input" id="radioYes" name="activeStatus" checked required>
+                                <input type="radio" value="1" class="form-check-input" id="firstOffenseYes" name="firstOffense" required>
                                 <label class="form-check-label" for="radioYes">Yes</label>
                             </div>
                             <div class="form-check col">
-                                <input type="radio" value="0" class="form-check-input" id="radioNo" name="activeStatus">
+                                <input type="radio" value="0" class="form-check-input" id="firstOffenseNo" name="firstOffense">
                                 <label class="form-check-label" for="radioNo">No</label>
                             </div>
                         </div>
                     </div>
-                    <button type="button" name="submit" class="btn btn-primary btn-block text-light" id="cloudSubmit" onclick="uploadFiles()">Submit</button>
+                    <div class="form-group row secondOffense">
+                        <div class="col-4">
+                            <p class="fw-bold">Second Offense</p>
+                        </div>
+                        <div class="col row mx-0">
+                            <div class="form-check col-3">
+                                <input type="radio" value="1" class="form-check-input" id="secondOffenseYes" name="secondOffense" required>
+                                <label class="form-check-label" for="radioYes">Yes</label>
+                            </div>
+                            <div class="form-check col">
+                                <input type="radio" value="0" class="form-check-input" id="secondOffenseNo" name="secondOffense">
+                                <label class="form-check-label" for="radioNo">No</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row thirdOffense">
+                        <div class="col-4">
+                            <p class="fw-bold">Third Offense</p>
+                        </div>
+                        <div class="col row mx-0">
+                            <div class="form-check col-3">
+                                <input type="radio" value="1" class="form-check-input" id="thirdOffenseYes" name="thirdOffense" required>
+                                <label class="form-check-label" for="radioYes">Yes</label>
+                            </div>
+                            <div class="form-check col">
+                                <input type="radio" value="0" class="form-check-input" id="thirdOffenseNo" name="thirdOffense">
+                                <label class="form-check-label" for="radioNo">No</label>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" name="submit" class="btn btn-primary btn-block text-light" id="submit" onclick="submit">Submit</button>
                 </form>
             </div>
         </div>
