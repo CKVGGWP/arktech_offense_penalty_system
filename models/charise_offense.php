@@ -53,8 +53,15 @@ class Offense extends Database
 
     public function getTable($id = '')
     {
+        $penalty = [];
+        $sql2 = "SELECT penaltyCode FROM offense_penalty ORDER BY penaltyId";
+        $query2 = $this->connect()->query($sql2);
+        while ($row2 = $query2->fetch_assoc()) {
+            $penalty[] = $row2['penaltyCode'];
+        }
+
         $data = [];
-        $totalData = 0;
+        $totalData = 1;
 
         $sql = "SELECT 
                 listId, 
@@ -77,19 +84,15 @@ class Offense extends Database
             while ($row = $query->fetch_assoc()) {
                 extract($row);
 
-                if ($offenseId > 6) {
-                    $offenseId = str_split($offenseId);
-                    $offenseId = $offenseId[0] . '.' . $offenseId[1] . '.' . $offenseId[2];
-                } else {
-                    $offenseId = $offenseId;
-                }
+                $offenseId = str_split($offenseId);
+                $offenseType = $this->selectOffenseType($offenseId);
 
                 $data[] = [
-                    $idNumber,
-                    $offenseId,
-                    ($offense1 == 0) ? "No" : "Yes",
-                    ($offense2 == 0) ? "No" : "Yes",
-                    ($offense3 == 0) ? "No" : "Yes",
+                    $totalData,
+                    $offenseType,
+                    ($offense1 == 0) ? "" : $penalty[$offense1 - 1],
+                    ($offense2 == 0) ? "" : $penalty[$offense1 - 1],
+                    ($offense3 == 0) ? "" : $penalty[$offense1 - 1],
                     ($dateInput == "0000-00-00 00:00:00") ? "" : date("F j, Y", strtotime($dateInput)),
                     ($dateUpdate == "0000-00-00 00:00:00") ? "" : date("F j, Y", strtotime($dateUpdate))
                 ];
@@ -108,16 +111,47 @@ class Offense extends Database
         return json_encode($json_data);  // send data as json format
     }
 
-    public function selectEmployee()
+    private function selectOffenseType($id)
     {
-        $sql = "SELECT
+        $offenseType = [];
+
+        $sql = "SELECT offenseType FROM offense";
+
+        if (is_array($id)) {
+            $sql .= " WHERE offenseId IN (" . implode(',', $id) . ")";
+        } else {
+            $sql .= " WHERE offenseId = '$id'";
+        }
+
+        $query = $this->connect()->query($sql);
+
+        while ($row = $query->fetch_assoc()) {
+            $offenseType[] = $row['offenseType'];
+        }
+
+        $offenseType = array_map(function ($offenseType) {
+            return substr($offenseType, 0, -1);
+        }, $offenseType);
+
+        return implode('<br><b>', $offenseType);
+    }
+
+    public function selectEmployee($id = '')
+    {
+        $sql = "SELECT 
+                DISTINCT
                 e.idNumber, 
                 e.firstName, 
                 e.surName
                 FROM hr_employee e
-                JOIN hr_dtr d ON e.idNumber = d.employeeId
-                GROUP BY e.idNumber";
+                JOIN hr_dtr d ON e.idNumber = d.employeeId";
         $query = $this->connect()->query($sql);
+
+        if ($id != '') {
+            $sql .= " WHERE e.idNumber = '$id'";
+        }
+
+        $sql .= " GROUP BY e.idNumber";
 
         $data = [];
 
@@ -166,7 +200,7 @@ class Offense extends Database
 
     public function addOffense($data)
     {
-        $offense = $this->checkOffense($data['idNumber']);
+        $offense = $this->checkOffense($data['employee']);
         $offenses = '';
 
         if ($offense != FALSE) {
@@ -179,8 +213,10 @@ class Offense extends Database
             $offenses .= $this->selectPenalty($data['category2']);
         }
 
+        $off = $data['category1'] . $data['category2'];
+
         $sql = "INSERT INTO offense_list(idNumber, offenseId, offense1, offense2, offense3, dateInput)
- 				VALUES ('" . $data['employee'] . "', '" . $offenses . "', '" . $data['firstOffense'] . "', '" . $data['secondOffense'] . "', '" . $data['thirdOffense'] . "', '" . $data['date'] . "')";
+ 				VALUES ('" . $data['employee'] . "', '$off', '" . $data['firstOffense'] . "', '" . $data['secondOffense'] . "', '" . $data['thirdOffense'] . "', '" . $data['date'] . "')";
         $query = $this->connect()->query($sql);
 
         if ($query) {
@@ -188,6 +224,10 @@ class Offense extends Database
         } else {
             return 2;
         }
+    }
+
+    private function updateOffense()
+    {
     }
 
     private function checkOffense($id)
