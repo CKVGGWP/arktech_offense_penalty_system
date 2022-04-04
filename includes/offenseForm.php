@@ -46,52 +46,9 @@
                             </select>
                         </div>
                     </div>
-                    <div class="form-group row firstOffense">
-                        <div class="col-4">
-                            <p class="fw-bold">First Offense</p>
-                        </div>
-                        <div class="col row mx-0">
-                            <div class="form-check col-3">
-                                <input type="radio" value="1" class="form-check-input" id="firstOffenseYes" name="firstOffense" required>
-                                <label class="form-check-label" for="radioYes">Yes</label>
-                            </div>
-                            <div class="form-check col">
-                                <input type="radio" value="0" class="form-check-input" id="firstOffenseNo" name="firstOffense">
-                                <label class="form-check-label" for="radioNo">No</label>
-                            </div>
-                        </div>
+                    <div id="buttonSubmit">
+
                     </div>
-                    <div class="form-group row secondOffense">
-                        <div class="col-4">
-                            <p class="fw-bold">Second Offense</p>
-                        </div>
-                        <div class="col row mx-0">
-                            <div class="form-check col-3">
-                                <input type="radio" value="1" class="form-check-input" id="secondOffenseYes" name="secondOffense" required>
-                                <label class="form-check-label" for="radioYes">Yes</label>
-                            </div>
-                            <div class="form-check col">
-                                <input type="radio" value="0" class="form-check-input" id="secondOffenseNo" name="secondOffense">
-                                <label class="form-check-label" for="radioNo">No</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group row thirdOffense">
-                        <div class="col-4">
-                            <p class="fw-bold">Third Offense</p>
-                        </div>
-                        <div class="col row mx-0">
-                            <div class="form-check col-3">
-                                <input type="radio" value="1" class="form-check-input" id="thirdOffenseYes" name="thirdOffense" required>
-                                <label class="form-check-label" for="radioYes">Yes</label>
-                            </div>
-                            <div class="form-check col">
-                                <input type="radio" value="0" class="form-check-input" id="thirdOffenseNo" name="thirdOffense">
-                                <label class="form-check-label" for="radioNo">No</label>
-                            </div>
-                        </div>
-                    </div>
-                    <button type="submit" name="submit" class="btn btn-primary btn-block text-light" id="submit" onclick="submit">Submit</button>
                 </form>
             </div>
         </div>
@@ -100,16 +57,16 @@
         <div class="card shadow mb-4">
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-bordered table-striped table-hover text-center text-nowrap" id="userTable" width="100%" cellspacing="0">
+                    <table class="table table-bordered table-striped table-hover text-nowrap" id="userTable" width="100%" cellspacing="0">
                         <thead>
                             <tr>
-                                <th class="text-nowrap">Name</th>
-                                <th class="text-wrap">Offense Type</th>
-                                <th class="text-wrap">1st Offense</th>
-                                <th class="text-wrap">2nd Offense</th>
-                                <th class="text-wrap">3rd Offense</th>
-                                <th class="text-wrap">Date Input</th>
-                                <th class="text-wrap">Date Updated</th>
+                                <th class="text-nowrap text-center">#</th>
+                                <th class="text-wrap text-center">Offense Type</th>
+                                <th class="text-wrap text-center">1st Offense</th>
+                                <th class="text-wrap text-center">2nd Offense</th>
+                                <th class="text-wrap text-center">3rd Offense</th>
+                                <th class="text-wrap text-center">Date Input</th>
+                                <th class="text-wrap text-center">Date Updated</th>
                             </tr>
                         </thead>
                         <tbody>

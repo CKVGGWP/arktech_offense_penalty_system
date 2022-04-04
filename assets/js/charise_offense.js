@@ -6,6 +6,16 @@ $(document).ready(function () {
 
 $("#employee").on("change", function () {
   $("#category1Group").removeClass("d-none");
+
+  $.ajax({
+    url: "controllers/charise_newOffenseController.php",
+    type: "POST",
+    data: { button: 1, employee: $("#employee").val() },
+    dataType: "json",
+    success: function (data) {
+      $("#buttonSubmit").html(data);
+    },
+  });
 });
 
 $("#category1").on("change", function () {
@@ -63,7 +73,10 @@ $("#employee").on("change", function () {
       },
     },
     createdRow: function (row, data, index) {},
-    columnDefs: [],
+    columnDefs: [
+      { className: "text-left", targets: [1] },
+      { className: "text-center", targets: [0, 2, 3, 4, 5, 6] },
+    ],
     fixedColumns: false,
     deferRender: true,
     scrollY: 500,
@@ -92,7 +105,10 @@ if ($("#offenseTable").length > 0) {
       },
     },
     createdRow: function (data) {},
-    columnDefs: [],
+    columnDefs: [
+      { className: "text-left", targets: [1] },
+      { className: "text-center", targets: [0, 2, 3, 4, 5, 6] },
+    ],
     fixedColumns: true,
     deferRender: true,
     scrollY: 500,
@@ -110,9 +126,6 @@ $("#offenseForm").on("submit", function (e) {
   let employee = $("#employee").val();
   let category1 = $("#category1").val();
   let category2 = $("#category2").val();
-  let firstOffense = $("input[name='firstOffense']:checked").val();
-  let secondOffense = $("input[name='secondOffense']:checked").val();
-  let thirdOffense = $("input[name='thirdOffense']:checked").val();
   let employeeName = $("#employee option:selected").text();
 
   if (employee == "") {
@@ -136,11 +149,9 @@ $("#offenseForm").on("submit", function (e) {
         employee: employee,
         category1: category1,
         category2: category2,
-        firstOffense: firstOffense,
-        secondOffense: secondOffense,
-        thirdOffense: thirdOffense,
       },
       success: function (response) {
+        // alert(response);
         if (response == 1) {
           Swal.fire({
             icon: "success",
@@ -154,6 +165,26 @@ $("#offenseForm").on("submit", function (e) {
             icon: "error",
             title: "Something went wrong!",
             text: "There is a problem with the server. Please try again later!",
+          });
+        } else if (response == 3) {
+          Swal.fire({
+            icon: "success",
+            title: "Offense Updated",
+            text: employeeName + " offense has been updated",
+          }).then((result) => {
+            location.reload();
+          });
+        } else if (response == 4) {
+          Swal.fire({
+            icon: "error",
+            title: "Sub Offense Field is Empty!",
+            text: "Please select a sub-offense",
+          });
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Something went wrong!",
+            text: response,
           });
         }
       },

@@ -51,17 +51,11 @@ class Offense extends Database
         return json_encode($option);
     }
 
-    public function getTable($id = '')
+    public function getTable($id = '', $table = '')
     {
-        $penalty = [];
-        $sql2 = "SELECT penaltyCode FROM offense_penalty ORDER BY penaltyId";
-        $query2 = $this->connect()->query($sql2);
-        while ($row2 = $query2->fetch_assoc()) {
-            $penalty[] = $row2['penaltyCode'];
-        }
-
         $data = [];
         $totalData = 1;
+        $penaltyArray = [];
 
         $sql = "SELECT 
                 listId, 
@@ -84,18 +78,49 @@ class Offense extends Database
             while ($row = $query->fetch_assoc()) {
                 extract($row);
 
+                $employee = $this->selectEmployee($idNumber);
+
+                foreach ($employee as $key => $empRow) {
+                    $employeeName = $empRow['firstName'] . " " . $empRow['surName'];
+                }
+
                 $offenseId = str_split($offenseId);
                 $offenseType = $this->selectOffenseType($offenseId);
+                $offenses1 = str_split($offense1);
+                $offenses2 = ($offense2 != '') ? str_split($offense2) : '';
+                $offenses3 = ($offense3 != '') ? str_split($offense3) : '';
 
-                $data[] = [
-                    $totalData,
-                    $offenseType,
-                    ($offense1 == 0) ? "" : $penalty[$offense1 - 1],
-                    ($offense2 == 0) ? "" : $penalty[$offense1 - 1],
-                    ($offense3 == 0) ? "" : $penalty[$offense1 - 1],
-                    ($dateInput == "0000-00-00 00:00:00") ? "" : date("F j, Y", strtotime($dateInput)),
-                    ($dateUpdate == "0000-00-00 00:00:00") ? "" : date("F j, Y", strtotime($dateUpdate))
-                ];
+                $penaltyArray = array(
+                    'offense1' => $this->selectPenaltyType($offenses1),
+                    'offense2' => $this->selectPenaltyType($offenses2),
+                    'offense3' => $this->selectPenaltyType($offenses3),
+                );
+
+                if ($table != '') {
+                    $data[] = [
+                        $totalData,
+                        $employeeName,
+                        $offenseType,
+                        ($penaltyArray['offense1'] == '') ? "" : $penaltyArray['offense1'],
+                        ($penaltyArray['offense2'] == '') ? "" : $penaltyArray['offense2'],
+                        ($penaltyArray['offense3'] == '') ? "" : $penaltyArray['offense3'],
+                        ($dateInput == "0000-00-00 00:00:00") ? "" : date("F j, Y - H:i:s", strtotime($dateInput)),
+                        ($dateUpdate == "0000-00-00 00:00:00") ? "" : date("F j, Y - H:i:s", strtotime($dateUpdate))
+
+                    ];
+                } else {
+                    $data[] = [
+                        $totalData,
+                        $offenseType,
+                        ($penaltyArray['offense1'] == '') ? "" : $penaltyArray['offense1'],
+                        ($penaltyArray['offense2'] == '') ? "" : $penaltyArray['offense2'],
+                        ($penaltyArray['offense3'] == '') ? "" : $penaltyArray['offense3'],
+                        ($dateInput == "0000-00-00 00:00:00") ? "" : date("F j, Y - H:i:s", strtotime($dateInput)),
+                        ($dateUpdate == "0000-00-00 00:00:00") ? "" : date("F j, Y - H:i:s", strtotime($dateUpdate))
+
+                    ];
+                }
+
                 $totalData++;
             }
         }
@@ -109,6 +134,31 @@ class Offense extends Database
         );
 
         return json_encode($json_data);  // send data as json format
+    }
+
+    private function selectPenaltyType($id)
+    {
+        $penaltyCode = [];
+
+        $sql = "SELECT penaltyCode FROM offense_penalty";
+
+        if (is_array($id)) {
+            $sql .= " WHERE penaltyId IN (" . implode(',', $id) . ")";
+        } else {
+            $sql .= " WHERE penaltyId = '$id'";
+        }
+
+        $query = $this->connect()->query($sql);
+
+        while ($row = $query->fetch_assoc()) {
+            $penaltyCode[] = $row['penaltyCode'];
+        }
+
+        if (is_array($penaltyCode)) {
+            return implode('-', $penaltyCode);
+        } else {
+            return $penaltyCode;
+        }
     }
 
     private function selectOffenseType($id)
@@ -140,18 +190,18 @@ class Offense extends Database
     {
         $sql = "SELECT 
                 DISTINCT
-                e.idNumber, 
-                e.firstName, 
-                e.surName
-                FROM hr_employee e
-                JOIN hr_dtr d ON e.idNumber = d.employeeId";
-        $query = $this->connect()->query($sql);
+                idNumber, 
+                firstName, 
+                surName
+                FROM hr_employee";
 
         if ($id != '') {
-            $sql .= " WHERE e.idNumber = '$id'";
+            $sql .= " WHERE idNumber = '$id'";
         }
 
-        $sql .= " GROUP BY e.idNumber";
+        $sql .= " GROUP BY idNumber";
+
+        $query = $this->connect()->query($sql);
 
         $data = [];
 
@@ -200,23 +250,32 @@ class Offense extends Database
 
     public function addOffense($data)
     {
-        $offense = $this->checkOffense($data['employee']);
-        $offenses = '';
-
-        if ($offense != FALSE) {
-            while ($row = $offense->fetch_assoc()) {
-                extract($row);
-
-                $offenses .= $this->selectPenalty($data['category2'], $offense1, $offense2, $offense3);
-            }
-        } else {
-            $offenses .= $this->selectPenalty($data['category2']);
-        }
-
         $off = $data['category1'] . $data['category2'];
 
+        $offense = $this->checkOffense($data['employee'], $off);
+
+        if ($offense != false) {
+            echo $this->updateOffense($data);
+        } else {
+            echo $this->insertOffense($data, $off);
+        }
+    }
+
+    private function insertOffense($data, $off)
+    {
+        if ($off == '46') {
+            $penalty = '123';
+        } else {
+            $penalty = '1';
+        }
+
+        if ($off <= 6) {
+            return 4;
+            exit();
+        }
+
         $sql = "INSERT INTO offense_list(idNumber, offenseId, offense1, offense2, offense3, dateInput)
- 				VALUES ('" . $data['employee'] . "', '$off', '" . $data['firstOffense'] . "', '" . $data['secondOffense'] . "', '" . $data['thirdOffense'] . "', '" . $data['date'] . "')";
+ 				VALUES ('" . $data['employee'] . "', '$off', '$penalty', '', '', '" . $data['date'] . "')";
         $query = $this->connect()->query($sql);
 
         if ($query) {
@@ -226,28 +285,70 @@ class Offense extends Database
         }
     }
 
-    private function updateOffense()
+    private function updateOffense($data)
     {
+        $off = $data['category1'] . $data['category2'];
+        $offense = $this->checkOffense($data['employee'], $off);
+        $offenseId = $data['category2'];
+
+        foreach ($offense as $key => $row) {
+            if ($row['offense2'] != 0) {
+                $offenseNum = '3';
+            } else {
+                $offenseNum = '2';
+            }
+        }
+
+        $penalty = $this->selectPenalty($offenseId, $offenseNum);
+
+        $sql = "UPDATE 
+                offense_list o
+                LEFT JOIN hr_employee e ON e.idNumber = o.idNumber 
+                SET o.offense" . $offenseNum . " = '$penalty', 
+                o.dateUpdate = now()";
+        if ($offenseId == '6') {
+            $sql .= " ,e.status = 0";
+        }
+
+        $sql .= " WHERE o.idNumber = '" . $data['employee'] . "' 
+                AND o.offenseId ='" . $off . "'";
+
+        $query = $this->connect()->query($sql);
+
+        if ($query) {
+            return 3;
+        } else {
+            return 2;
+        }
     }
 
-    private function checkOffense($id)
+    private function checkOffense($id, $offenseId)
     {
+        $data = [];
         $sql = "SELECT 
                 offense1,
                 offense2,
                 offense3
                 FROM offense_list
                 WHERE idNumber = '$id'";
+
+        if ($offenseId != "") {
+            $sql .= " AND offenseId = '$offenseId'";
+        }
+
         $query = $this->connect()->query($sql);
 
         if ($query->num_rows > 0) {
-            return $query;
+            while ($row = $query->fetch_assoc()) {
+                $data[] = $row;
+            }
+            return $data;
         } else {
             return false;
         }
     }
 
-    private function selectPenalty($offenseId, $offense1 = '', $offense2 = '', $offense3 = '')
+    private function selectPenalty($offenseId, $offenseNum)
     {
         $penalty = array(
             '1st' => '1',
@@ -260,13 +361,7 @@ class Offense extends Database
 
         $id = '';
 
-        if ($offense1 == 0 && $offense2 == 0 && $offense3 == 0) {
-            if ($offenseId == 2 or $offenseId == 3 or $offenseId == 5) {
-                $id .= $penalty['1st'];
-            } else if ($offenseId == 6) {
-                $id .= $penalty['1st'] . $penalty['2nd'] . $penalty['3rd'];
-            }
-        } else if ($offense1 == 1 && $offense2 == 0 && $offense3 == 0) {
+        if ($offenseNum == 2) {
             if ($offenseId == 2 or $offenseId == 5) {
                 $id .= $penalty['2nd'];
             } else if ($offenseId == 3) {
@@ -274,12 +369,27 @@ class Offense extends Database
             } else if ($offenseId == 6) {
                 $id .= $penalty['6th'];
             }
-        } else if ($offense1 == 1 && $offense2 == 1 && $offense3 == 0) {
+        } else {
             if ($offenseId == 2 or $offenseId == 3 or $offenseId == 5) {
                 $id .= $penalty['6th'];
             }
         }
 
         return $id;
+    }
+
+    public function selectTerminatedOffense($id)
+    {
+        $button = '';
+        $sql = "SELECT * FROM offense_list WHERE (offense2 = 6 OR offense3 = 6) AND idNumber = '$id'";
+        $query = $this->connect()->query($sql);
+
+        if ($query->num_rows > 0) {
+            $button .= '<button disabled class="btn btn-danger btn-block text-light">Employee Terminated</button>';
+        } else {
+            $button .= '<button type="submit" name="submit" class="btn btn-primary btn-block text-light" id="submit">Submit</button>';
+        }
+
+        return json_encode($button);
     }
 }
