@@ -141,53 +141,63 @@ $("#offenseForm").on("submit", function (e) {
       text: "Please select a sub-offense",
     });
   } else {
-    $.ajax({
-      url: "controllers/charise_newOffenseController.php",
-      type: "POST",
-      data: {
-        addOffense: true,
-        employee: employee,
-        category1: category1,
-        category2: category2,
-      },
-      success: function (response) {
-        // alert(response);
-        if (response == 1) {
-          Swal.fire({
-            icon: "success",
-            title: "Offense Added",
-            text: "Offense has been added to " + employeeName,
-          }).then((result) => {
-            location.reload();
-          });
-        } else if (response == 2) {
-          Swal.fire({
-            icon: "error",
-            title: "Something went wrong!",
-            text: "There is a problem with the server. Please try again later!",
-          });
-        } else if (response == 3) {
-          Swal.fire({
-            icon: "success",
-            title: "Offense Updated",
-            text: employeeName + " offense has been updated",
-          }).then((result) => {
-            location.reload();
-          });
-        } else if (response == 4) {
-          Swal.fire({
-            icon: "error",
-            title: "Sub Offense Field is Empty!",
-            text: "Please select a sub-offense",
-          });
-        } else {
-          Swal.fire({
-            icon: "error",
-            title: "Something went wrong!",
-            text: response,
-          });
-        }
-      },
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You are about to add/update an offense to " + employeeName,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Confirm",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        $.ajax({
+          url: "controllers/charise_newOffenseController.php",
+          type: "POST",
+          data: {
+            addOffense: true,
+            employee: employee,
+            category1: category1,
+            category2: category2,
+          },
+          success: function (response) {
+            // alert(response);
+            if (response == 1) {
+              Swal.fire({
+                icon: "success",
+                title: "Offense Added",
+                text: "Offense has been added to " + employeeName,
+              }).then((result) => {
+                location.reload();
+              });
+            } else if (response == 2) {
+              Swal.fire({
+                icon: "error",
+                title: "Something went wrong!",
+                text: "There is a problem with the server. Please try again later!",
+              });
+            } else if (response == 3) {
+              Swal.fire({
+                icon: "success",
+                title: "Offense Updated",
+                text: employeeName + " offense has been updated",
+              }).then((result) => {
+                location.reload();
+              });
+            } else if (response == 4) {
+              Swal.fire({
+                icon: "error",
+                title: "Sub Offense Field is Empty!",
+                text: "Please select a sub-offense",
+              });
+            } else {
+              Swal.fire({
+                icon: "error",
+                title: "Something went wrong!",
+                text: response,
+              });
+            }
+          },
+        });
+      }
     });
   }
 });
